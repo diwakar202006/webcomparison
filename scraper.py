@@ -4,23 +4,31 @@ from bs4 import BeautifulSoup
 def compare_price(product):
 
     headers = {
-        "User-Agent": "Mozilla/5.0"
+        "User-Agent": "Mozilla/5.0",
+        "Accept-Language": "en-US,en;q=0.9"
     }
 
-    # AMAZON SEARCH
-    amazon_url = f"https://www.amazon.in/s?k={product}"
+    url = f"https://www.amazon.in/s?k={product.replace(' ','+')}"
 
-    r = requests.get(amazon_url, headers=headers)
-    soup = BeautifulSoup(r.text, "html.parser")
+    response = requests.get(url, headers=headers)
 
-    price = soup.select_one(".a-price-whole")
+    soup = BeautifulSoup(response.text, "html.parser")
 
-    if price:
-        amazon_price = price.text
+    # find all prices
+    prices = soup.select(".a-price-whole")
+
+    if prices:
+        amazon_price = prices[0].text.strip()
     else:
-        amazon_price = "Not found"
+        amazon_price = "Price not found"
 
     return {
         "amazon": amazon_price,
         "flipkart": "Coming soon"
     }
+
+
+if __name__ == "__main__":
+    product = input("Enter product name: ")
+    result = compare_price(product)
+    print(result)
