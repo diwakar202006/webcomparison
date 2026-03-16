@@ -1,34 +1,52 @@
 import requests
 from bs4 import BeautifulSoup
 
-def compare_price(product):
 
-    headers = {
-        "User-Agent": "Mozilla/5.0",
-        "Accept-Language": "en-US,en;q=0.9"
-    }
+headers = {
+    "User-Agent": "Mozilla/5.0",
+    "Accept-Language": "en-US,en;q=0.9"
+}
+
+
+def amazon_price(product):
 
     url = f"https://www.amazon.in/s?k={product.replace(' ','+')}"
 
-    response = requests.get(url, headers=headers)
+    r = requests.get(url, headers=headers)
 
-    soup = BeautifulSoup(response.text, "html.parser")
+    soup = BeautifulSoup(r.text, "html.parser")
 
-    # find all prices
-    prices = soup.select(".a-price-whole")
+    price = soup.select_one(".a-price-whole")
 
-    if prices:
-        amazon_price = prices[0].text.strip()
+    if price:
+        return int(price.text.replace(",",""))
     else:
-        amazon_price = "Price not found"
-
-    return {
-        "amazon": amazon_price,
-        "flipkart": "Coming soon"
-    }
+        return None
 
 
-if __name__ == "__main__":
-    product = input("Enter product name: ")
-    result = compare_price(product)
-    print(result)
+def compare_price(product, stores):
+
+    result = {}
+
+    if "amazon" in stores:
+
+        price = amazon_price(product)
+
+        if price:
+            result["amazon"] = price
+        else:
+            result["amazon"] = "Not found"
+
+    if "flipkart" in stores:
+        result["flipkart"] = "Coming soon"
+
+    if "myntra" in stores:
+        result["myntra"] = "Coming soon"
+
+    if "ajio" in stores:
+        result["ajio"] = "Coming soon"
+
+    if "jiomart" in stores:
+        result["jiomart"] = "Coming soon"
+
+    return result

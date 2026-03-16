@@ -2,21 +2,84 @@
 <html>
 <head>
 <title>Price Comparison</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
 </head>
 
 <body>
 
-<h2>Product Price Comparison</h2>
+<div class="container">
+
+<h1>Price Comparison</h1>
 
 <form method="POST">
-<input type="text" name="product" placeholder="Enter product name">
+
+<input type="text" name="product" placeholder="Enter product name" required>
+
+<h3>Select stores</h3>
+
+<div class="stores">
+
+<label><input type="checkbox" name="store" value="amazon"> Amazon</label>
+<label><input type="checkbox" name="store" value="flipkart"> Flipkart</label>
+<label><input type="checkbox" name="store" value="myntra"> Myntra</label>
+<label><input type="checkbox" name="store" value="ajio"> Ajio</label>
+<label><input type="checkbox" name="store" value="jiomart"> JioMart</label>
+
+</div>
+
 <button type="submit">Search</button>
+
 </form>
 
 {% if result %}
-<h3>Amazon Price: {{result.amazon}}</h3>
-<h3>Flipkart Price: {{result.flipkart}}</h3>
+
+<div class="result">
+
+<h3>Price Results</h3>
+
+{% if result.amazon %}
+<p>🛒 Amazon: ₹{{result.amazon}}</p>
 {% endif %}
+
+{% if result.flipkart %}
+<p>🛒 Flipkart: {{result.flipkart}}</p>
+{% endif %}
+
+{% if result.myntra %}
+<p>🛒 Myntra: {{result.myntra}}</p>
+{% endif %}
+
+{% if result.ajio %}
+<p>🛒 Ajio: {{result.ajio}}</p>
+{% endif %}
+
+{% if result.jiomart %}
+<p>🛒 JioMart: {{result.jiomart}}</p>
+{% endif %}
+
+</div>
+
+<div class="track-box">
+
+<h3>Track Price Drop 🔔</h3>
+
+<form method="POST" action="/track">
+
+<input type="hidden" name="product" value="{{request.form.product}}">
+
+<input type="text" name="phone" placeholder="Enter WhatsApp number">
+
+<button type="submit">Track Price</button>
+
+</form>
+
+</div>
+
+{% endif %}
+
+</div>
 
 </body>
 </html>
