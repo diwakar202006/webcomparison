@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Register</title>
+
+<style>
+body {
+    font-family: Arial;
+    text-align: center;
+    margin-top: 100px;
+    background-color: #f5f5f5;
+}
+
+.container {
+    background: white;
+    padding: 30px;
+    width: 300px;
+    margin: auto;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px gray;
+}
+
+input, button {
+    padding: 10px;
+    margin: 8px;
+    width: 80%;
+}
+
+button {
+    cursor: pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Register</h2>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <p style="color:red;">{{ messages[0] }}</p>
+  {% endif %}
+{% endwith %}
+
+<form method="POST">
+    <input name="username" placeholder="Username" required>
+    <br>
+    <input name="password" type="password" placeholder="Password" required>
+    <br>
+    <button type="submit">Register</button>
+</form>
+
+<br>
+
+<p>Already have an account?</p>
+
+<a href="/login">
+    <button>Login</button>
+</a>
+
+</div>
+
+</body>
+</html>
