@@ -61,15 +61,22 @@
 
 </div>
 
+<!-- TRACK PRICE SECTION -->
 <div class="track-box">
 
 <h3>Track Price Drop 🔔</h3>
 
 <form method="POST" action="/track">
 
-<input type="hidden" name="product" value="{{request.form.product}}">
+<!-- pass product safely -->
+<input type="hidden" name="product" value="{{ request.form['product'] }}">
 
-<input type="text" name="phone" placeholder="Enter WhatsApp number">
+<!-- pass price ONLY if available -->
+{% if result.amazon %}
+<input type="hidden" name="price" value="{{ result.amazon }}">
+{% endif %}
+
+<input type="text" name="phone" placeholder="Enter WhatsApp number" required>
 
 <button type="submit">Track Price</button>
 

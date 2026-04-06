@@ -6,9 +6,12 @@ headers = {
     "User-Agent": "Mozilla/5.0",
     "Accept-Language": "en-US,en;q=0.9"
 }
-
-
 def amazon_price(product):
+
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        "Accept-Language": "en-US,en;q=0.9"
+    }
 
     url = f"https://www.amazon.in/s?k={product.replace(' ','+')}"
 
@@ -16,13 +19,21 @@ def amazon_price(product):
 
     soup = BeautifulSoup(r.text, "html.parser")
 
-    price = soup.select_one(".a-price-whole")
+    whole = soup.select_one(".a-price-whole")
+    fraction = soup.select_one(".a-price-fraction")
 
-    if price:
-        return int(price.text.replace(",",""))
-    else:
-        return None
+    if whole:
+        whole_text = whole.text.replace(",", "").strip()
 
+        if fraction:
+            fraction_text = fraction.text.strip()
+            full_price = whole_text + fraction_text
+        else:
+            full_price = whole_text
+
+        return int(full_price)
+
+    return None
 
 def compare_price(product, stores):
 
