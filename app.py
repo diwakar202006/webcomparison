@@ -13,15 +13,14 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "fallback-secret")
 # ---------------- DATABASE CONFIG ----------------
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-if DATABASE_URL:
-    # ✅ FIX for Railway PostgreSQL
-    if DATABASE_URL.startswith("postgres://"):
-        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+if not DATABASE_URL:
+    raise ValueError("❌ DATABASE_URL is not set. Check Railway variables.")
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
-else:
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///products.db"
+# Fix postgres:// → postgresql://
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
@@ -33,12 +32,16 @@ login_manager.login_view = "login"
 
 # ---------------- USER MODEL ----------------
 class User(UserMixin, db.Model):
+    __tablename__ = "user"   # 🔥 important for Postgres
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
 
 # ---------------- PRODUCT MODEL ----------------
 class Product(db.Model):
+    __tablename__ = "product"   # 🔥 important
+
     id = db.Column(db.Integer, primary_key=True)
     product = db.Column(db.String(200))
     price = db.Column(db.Integer)
@@ -46,13 +49,14 @@ class Product(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 # ---------------- CREATE DATABASE ----------------
-with app.app_context():
-    db.create_all()
+@app.before_request
+def create_tables():
+    db.create_all()   # ✅ ensures tables exist in PostgreSQL
 
 # ---------------- LOAD USER ----------------
 @login_manager.user_loader
 def load_user(user_id):
-    return db.session.get(User, int(user_id))  # ✅ updated method
+    return db.session.get(User, int(user_id))
 
 # ---------------- HOME ROUTE ----------------
 @app.route("/", methods=["GET", "POST"])
@@ -76,7 +80,6 @@ def register():
         username = request.form["username"]
         password = request.form["password"]
 
-        # ✅ Prevent duplicate users
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
             flash("Username already exists!")
@@ -138,7 +141,7 @@ def track():
         product=product,
         price=price,
         phone=phone,
-        user_id=current_user.id   # ✅ linked to user
+        user_id=current_user.id
     )
 
     db.session.add(new_product)
