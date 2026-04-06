@@ -11,6 +11,14 @@
 
 <div class="container">
 
+<!-- ✅ NEW: USER + LOGOUT -->
+<div style="display:flex; justify-content:space-between; align-items:center;">
+    <p>Welcome, {{ current_user.username }} 👋</p>
+    <a href="/logout">
+        <button>Logout</button>
+    </a>
+</div>
+
 <h1>Price Comparison</h1>
 
 <form method="POST">
@@ -44,19 +52,19 @@
 {% endif %}
 
 {% if result.flipkart %}
-<p>🛒 Flipkart: {{result.flipkart}}</p>
+<p>🛒 Flipkart: ₹{{result.flipkart}}</p> <!-- ✅ fixed -->
 {% endif %}
 
 {% if result.myntra %}
-<p>🛒 Myntra: {{result.myntra}}</p>
+<p>🛒 Myntra: ₹{{result.myntra}}</p>
 {% endif %}
 
 {% if result.ajio %}
-<p>🛒 Ajio: {{result.ajio}}</p>
+<p>🛒 Ajio: ₹{{result.ajio}}</p>
 {% endif %}
 
 {% if result.jiomart %}
-<p>🛒 JioMart: {{result.jiomart}}</p>
+<p>🛒 JioMart: ₹{{result.jiomart}}</p>
 {% endif %}
 
 </div>
@@ -68,10 +76,8 @@
 
 <form method="POST" action="/track">
 
-<!-- pass product safely -->
 <input type="hidden" name="product" value="{{ request.form['product'] }}">
 
-<!-- pass price ONLY if available -->
 {% if result.amazon %}
 <input type="hidden" name="price" value="{{ result.amazon }}">
 {% endif %}
